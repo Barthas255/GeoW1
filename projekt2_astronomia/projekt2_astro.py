@@ -62,24 +62,14 @@ def x_y_z(z, Az, r = 1):
     return x, y, z
 
 
-'''t = kat_godz(obs1[1],rektascencja,0, 3)
-print("kat godzinny: ", t)
-xd2 = az_and_zenit(obs1[0],deklinacja,t)
-print('odleglosc zenitalna: %f, azymut gwiazdy = %f'%(xd2[0],xd2[1]))
-xd3 = x_y_z(xd2[0],xd2[1])
-print('X: %f, Y = %f, Z = %f'%(xd3[0], xd3[1], xd3[2]))'''
-
-#przesuwanie utworzonego wykresu
+#przesuwanie lewej górnej krawędzi wykresu do punktu x y
 def move_figure(f, x, y):
-    """Move figure's upper left corner to pixel (x, y)"""
     backend = matplotlib.get_backend()
     if backend == 'TkAgg':
         f.canvas.manager.window.wm_geometry("+%d+%d" % (x, y))
     elif backend == 'WXAgg':
         f.canvas.manager.window.SetPosition((x, y))
     else:
-        # This works for QT and GTK
-        # You can also use window.setGeometry
         f.canvas.manager.window.move(x, y)
 
 #Wykresy
