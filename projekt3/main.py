@@ -1,6 +1,6 @@
 import numpy as np
 
-nr = 5
+nr = 0
 
 fiA=50.25 + nr * 0.25
 lambdaA=20.75
@@ -17,6 +17,11 @@ e2 = 0.0066943800290  # bez jednostek
 b = a * (1 - e2) ** 0.5
 
 def vincenty(fi_a, lambda_a, fi_b, lambda_b, a, e2):
+    lambda_a = np.deg2rad(lambda_a)
+    fi_a = np.deg2rad(fi_a)
+    lambda_b = np.deg2rad(lambda_b)
+    fi_b = np.deg2rad(fi_b)
+
     #1.
     b = a * np.sqrt(1 - e2)
     f = 1 - b/a
@@ -78,12 +83,10 @@ def vincenty(fi_a, lambda_a, fi_b, lambda_b, a, e2):
     if Aab > 360:
         Aab -= 360
 
-    if licznik_ba > 0 and mianownik_ba > 0:
+    if mianownik_ba < 0:
         Aba += 180
-    elif mianownik_ba < 0:
+    elif licznik_ba < 0:
         Aba += 360
-    elif licznik_ab < 0:
-        Aba += 540
 
     if Aba > 360:
         Aba -= 360
@@ -93,22 +96,28 @@ def vincenty(fi_a, lambda_a, fi_b, lambda_b, a, e2):
 
 
 def kivioj(a,e2,prev_fi, prev_lamda, ds, prev_Az12):
+    prev_fi = np.deg2rad(prev_fi)
+    prev_lamda = np.deg2rad(prev_lamda)
+    prev_Az12 = np.deg2rad(prev_Az12)
+
     M = (a*(1-e2)) / (np.sqrt(((1-e2*(np.sin(prev_fi))**2)**3))) #glowne promienie krzywizny
     N = a/(np.sqrt(1-e2*(np.sin(prev_fi))**2)) #glowne promienie krzywizny
     delta_fi = (ds*np.cos(prev_Az12))/M #przyblizenie przyrostu szerokosci
     fi_sr_ds = prev_fi + 1/2 * delta_fi #srednia wartosc szerokosci elementu ds
 
-    sr_M = (a * (1 - e2)) / (np.sqrt(((1 - e2 * (np.sin(fi_sr_ds)) ** 2) ** 3))) #srednie M
-    sr_N = a / (np.sqrt(1 - e2 * (np.sin(fi_sr_ds)) ** 2)) #srednie N
-    A12_sr = prev_Az12 + ds/sr_N * np.sin(prev_Az12)*np.tan(fi_sr_ds) #sredni azymut
+    A12_sr = prev_Az12 + ds/N * np.sin(prev_Az12)*np.tan(fi_sr_ds) #sredni azymut
     #lepsze przyblizenia przyrostu wartosci fi, lambda, azymut
-    delta_fi = ds*np.cos(A12_sr)/sr_M
-    delta_lambda = (ds*np.sin(delta_fi))/(sr_N*np.cos(fi_sr_ds))
-    delta_Az12 = ds/sr_N * np.sin(A12_sr)*np.tan(fi_sr_ds)
+    delta_fi = ds*np.cos(A12_sr)/M
+    delta_lambda = (ds*np.sin(A12_sr))/(N*np.cos(fi_sr_ds))
+    delta_Az12 = (ds * np.sin(A12_sr)*np.tan(fi_sr_ds))/N
 
     next_fi = prev_fi + delta_fi
     next_lamda = prev_lamda + delta_lambda
     next_Az12 = prev_Az12 + delta_Az12
+
+    next_fi = np.rad2deg(next_fi)
+    next_lamda = np.rad2deg(next_lamda)
+    next_Az12 = np.rad2deg(next_Az12)
 
     return next_fi,next_lamda,next_Az12
 
@@ -140,19 +149,17 @@ ds = 1000
 s = s/2
 while s > 1000:
     fi,lam,az12 = kivioj(a,e2,fi,lam,ds,az12)
-    az21 = az12 + 180
     s -= 1000
 
 if s > 0:
     ds = s
     fi,lam,az12 = kivioj(a,e2,fi,lam,ds,az12)
-    az21 = az12 + 180
 
 fi_sr_szer = (fiA+fiD)/2
 lam_sr_szer = (lambdaA+lambdaD)/2
 
-odl,foo,bar = vincenty(fi,lam,fi_sr_szer,lam_sr_szer,a,e2)
+odl,Az12,Az21 = vincenty(fi,lam,fi_sr_szer,lam_sr_szer,a,e2)
 print("punkt średniej szerokości: " + str(fi_sr_szer) +" " + str(lam_sr_szer), "\npunkt środkowy: " +str(fi) +" "+str(lam),
       "\nróżnica odległości punktu środkowego i średniej szerokości: " + str(odl),
-      "\nazymut wprost pkt środkowego: " +str(az12), "\nazymut odwrotny pkt środkowego: " +str(az21) ,
+      "\nazymut wprost pkt środkowego: " +str(Az12), "\nazymut odwrotny pkt środkowego: " +str(Az21) ,
       "\npole prostokąta: " + str(pole(fiA,lambdaA,fiD,lambdaD,e2,b)) + " m^2")
