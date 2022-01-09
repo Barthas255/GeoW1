@@ -18,6 +18,7 @@ def geo2xyz(fi, lam, h): #GRS 80
     x = (N+h)*np.cos(fi)*np.cos(lam)
     y = (N+h)*np.cos(fi)*np.sin(lam)
     z = (N*(1-e2)+h)*np.sin(fi)
+
     return x, y, z
 
 def hirvonen(x,y,z):
@@ -69,6 +70,7 @@ def transformacja_bursy_wolfa(xp,yp,zp):
     return xyzw[0][0],xyzw[1][0],xyzw[2][0]
 
 
+#zamiana tekstowa stopni
 def stopnie(omega):
     omega2 = (omega - int(omega)) * 60
     omega3 = (omega2 - int(omega2)) * 60
@@ -80,11 +82,8 @@ def stopnie(omega):
     return f
 
 
-#przyklad warszawa
-#fii = 52.229722
-#lamd = 21.011666
-#H1 = 113
-fii = 50.00
+#dzialajacy przyklad
+'''fii = 50.00
 lamd = 20.00
 H1 = 100
 fii_text = stopnie(fii)
@@ -96,4 +95,32 @@ print("transformacja bursy wolfa: ",round(raz1,3),round(dwa2,3),round(trzy3,3))
 raz1,dwa2,trzy3 = hirvonen(raz1,dwa2,trzy3)
 raz1 = stopnie(raz1)
 dwa2 = stopnie(dwa2)
-print("hirvonen: ",raz1,dwa2,round(trzy3,3))
+print("hirvonen: ",raz1,dwa2,round(trzy3,3))'''
+
+#punkty z poprzedniego zadania
+A = (50.25, 20.75)
+B = (50.0, 20.75)
+C = (50.25, 21.25)
+D = (50.0, 21.25)
+S = (50.125, 21.0)
+M = (50.12525870, 21.00063676) #S i M policzone z zadania 3
+P = (A, B, C, D, S, M)
+slownik = {1:"A", 2:"B", 3:"C", 4:"D", 5:"S", 6:"M"}
+tab = []
+tab2 = []
+for i in range(6):
+    x, y, z = geo2xyz(P[i][0], P[i][1], H)
+    tab.append((x,y,z))
+    print("Współrzędne punktu " + slownik[i+1] + " na elipsoidzie GRS80: ", round(x, 3), round(y, 3), round(z, 3))
+print("---------------------------------------------------------------------------------")
+for i in range(6):
+    xkr, ykr, zkr = transformacja_bursy_wolfa(*tab[i])
+    tab2.append((xkr,ykr,zkr))
+    print("Współrzędne punktu " + slownik[i+1] + " na elipsoidzie Krasowskiego: ", round(xkr, 3), round(ykr, 3), round(zkr, 3))
+print("---------------------------------------------------------------------------------")
+for i in range(6):
+    phi, lam, h = hirvonen(*tab2[i])
+    phi = stopnie(phi)
+    lam = stopnie(lam)
+    print("Współrzędne geodezyjne punktu " + slownik[i+1], phi, lam, round(h, 3))
+print("---------------------------------------------------------------------------------")
