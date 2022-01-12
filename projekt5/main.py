@@ -37,7 +37,6 @@ def hirvonen(x,y,z):
     lam = np.arctan(y/x)
     N = akr / np.sqrt(1 - e2kr * np.sin(fi_next) ** 2)
     h = r/np.cos(fi_next) - N
-
     #print("współrzędne przed: ", x, y, z)
     x = (N+h)*np.cos(fi_next)*np.cos(lam)
     y = (N+h)*np.cos(fi_next)*np.sin(lam)
@@ -109,18 +108,21 @@ slownik = {1:"A", 2:"B", 3:"C", 4:"D", 5:"S", 6:"M"}
 tab = []
 tab2 = []
 for i in range(6):
+    print("Współrzędne punktu " + slownik[i+1] + " na elipsoidzie GRS80: ", stopnie(P[i][0]), stopnie(P[i][1]), H, "m")
+print("-" * 85)
+for i in range(6):
     x, y, z = geo2xyz(P[i][0], P[i][1], H)
     tab.append((x,y,z))
     print("Współrzędne punktu " + slownik[i+1] + " na elipsoidzie GRS80: ", round(x, 3), round(y, 3), round(z, 3))
-print("---------------------------------------------------------------------------------")
+print("-"*85)
 for i in range(6):
     xkr, ykr, zkr = transformacja_bursy_wolfa(*tab[i])
     tab2.append((xkr,ykr,zkr))
     print("Współrzędne punktu " + slownik[i+1] + " na elipsoidzie Krasowskiego: ", round(xkr, 3), round(ykr, 3), round(zkr, 3))
-print("---------------------------------------------------------------------------------")
+print("-"*85)
 for i in range(6):
     phi, lam, h = hirvonen(*tab2[i])
     phi = stopnie(phi)
     lam = stopnie(lam)
-    print("Współrzędne geodezyjne punktu " + slownik[i+1], phi, lam, round(h, 3))
-print("---------------------------------------------------------------------------------")
+    print("Współrzędne geodezyjne punktu " + slownik[i+1], phi, lam, round(h, 3),"m")
+print("-"*85)
