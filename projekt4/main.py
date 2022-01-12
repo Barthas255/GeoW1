@@ -204,7 +204,7 @@ for i in P:
     print("1992 > Gauss: ", round(x92, 3), round(y92, 3))
     print("2000 > Gauss: ", round(x00, 3), round(y00, 3))
     x92, y92, m, z, m92, z92, pgk2, p92, zgk, zp92 = gauss_kruger_odwrotny(x92, y92, i[1], "1992")
-    x00, y00, foo, bar, m00, z00, nothing, p00, something, zp00 = gauss_kruger_odwrotny(x00, y00, i[1], "2000")
+    x00, y00, _, _, m00, z00, _, p00, _, zp00 = gauss_kruger_odwrotny(x00, y00, i[1], "2000")
     print("1992 > Gauss > Geo: ", x92, y92)
     print("2000 > Gauss > Geo: ", x00, y00)
     print("mgk: ", round(m, 6))
